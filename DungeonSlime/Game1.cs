@@ -14,6 +14,12 @@ public class Game1 : Core
     // Defines the bat sprite
     private AnimatedSprite _bat;
 
+    // Tracks the position of the slime.
+    private Vector2 _slimePosition;
+
+    // Speed multiplier when moving.
+    private const float MOVEMENT_SPEED = 5.0f;
+
     public Game1() : base("Dungeon Slime", 1280, 720, false) { }
 
     protected override void Initialize()
@@ -39,6 +45,7 @@ public class Game1 : Core
 
     protected override void Update(GameTime gameTime)
     {
+        
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
@@ -48,8 +55,41 @@ public class Game1 : Core
         // Update the bat animated sprite.
         _bat.Update(gameTime);
         
+        // Check for mouse input and handle it.
+        CheckMouseInput();
 
         base.Update(gameTime);
+    }
+
+    private void CheckMouseInput()
+    {
+        // Get the current state of mouse input.
+        MouseState mouseState = Mouse.GetState();
+
+        // If the middle mouse button is held down, the movement speed increases by 1.5
+        float speed = MOVEMENT_SPEED;
+        if (mouseState.MiddleButton == ButtonState.Pressed)
+        {
+            speed *= 1.5f;
+        }
+        
+        // Check if the left mouse button is pressed down.
+        if (mouseState.LeftButton == ButtonState.Pressed)
+        {
+            // Move the slime up on the screen.
+            _slimePosition.Y -= speed;
+            // Move the slime left on the screen.
+            _slimePosition.X -= speed;
+        }
+
+        // Check if the right mouse button is pressed down.
+        if (mouseState.RightButton == ButtonState.Pressed)
+        {
+            // Move the slime down on the screen.
+            _slimePosition.Y += speed;
+            // Move the slime right on the screen.
+            _slimePosition.X += speed;
+        }
     }
 
     protected override void Draw(GameTime gameTime)
@@ -61,7 +101,7 @@ public class Game1 : Core
         SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
         // Draw the slime sprite
-        _slime.Draw(SpriteBatch, Vector2.One);
+        _slime.Draw(SpriteBatch, _slimePosition);
 
         // Draw the bat sprite 10px to the right of the slime
         _bat.Draw(SpriteBatch, new Vector2(_slime.Width + 10, 0));
